@@ -73,12 +73,9 @@ Qualquer contribuição que você fizer será **muito apreciada**.
 5. Faça o Push da Branch (`git push origin feature/AmazingFeature`)
 6. Abra um Pull Request
 
-## Licença
-
-Distribuído sob a Licença MIT. Veja `LICENSE` para mais informações.
 
 ## Contato
 
-maxbarbosa63@gmail.com
+- [Linkedin](https://www.linkedin.com/in/max-souza-4533b6196/)
 
-[@Maaacs](https://github.com/seu_usuario/projeto-monitoramentohttps://github.com/Maaacs)
+- [Github](https://github.com/seu_usuario/projeto-monitoramentohttps://github.com/Maaacs)
