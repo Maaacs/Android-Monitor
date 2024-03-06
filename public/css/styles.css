@@ -1,0 +1,40 @@
+#deviceHeader {
+    font-size: 37px; 
+}
+
+/* Mostrador de nivel de temperatura e clock*/
+#temperatura, #clock {
+    font-size: 20px;
+    margin: 5px;
+    padding: 10px 15px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    font-size: 18px;
+    visibility: hidden; 
+}
+/*Gráficos*/
+#temperatureChart, #clockChart {
+    max-height: 350px;
+}
+
+
+.export{
+    display: flex;
+    align-items: flex-start;
+}
+
+
+.alert {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 41px;
+    margin-left: 10px;
+}
+
+
+
+
+  
