@@ -1,4 +1,27 @@
+/**
+ * @author: Max Souza
+ * @github: https://github.com/Maaacs
+ * @repo: https://github.com/Maaacs/Android-Monitors
+ * 
+ * Descrição:
+ * Este código é parte do projeto Android Monitors, que
+ * fornece uma interface gráfica para monitoramento de dispositivos Android em tempo rea.
+ * Ele permite iniciar/parar a coleta de dados de temperatura e clock do dispositivo,
+ * assim como a exportação dos logs coletados para análise posterior.
+ *
+ * Contribuições são bem-vindas. Para contribuir, por favor visite o repositório do projeto no GitHub.
+ *
+ * Licença:
+ * Este código é distribuído sob a licença MIT, o que significa que pode ser utilizado,
+ * copiado, modificado e distribuído livremente, desde que seja mantido o mesmo cabeçalho de autoria.
+ *
+ * Copyright (c) 2024 Max Souza
+ */
+
+
+/*Titulo*/
 #deviceHeader {
+    padding-top: 20px;
     font-size: 37px; 
 }
 
@@ -16,22 +39,31 @@
 }
 /*Gráficos*/
 #temperatureChart, #clockChart {
-    max-height: 350px;
+    max-height: 300px;
 }
 
-
-.export{
+/*botão principal*/
+.iniciar-button{
+    padding-top: 12px;
     display: flex;
-    align-items: flex-start;
+    align-items:flex-end;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 
-.alert {
+/* Alerta*/
+#liveAlertPlaceholder {
+    padding-top: 10px;
+}
+/* Alerta*/
+#liveAlertPlaceholder .alert {
+    padding-left: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    max-height: 41px;
-    margin-left: 10px;
+    height: 50px; 
 }
 
 

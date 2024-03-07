@@ -1,3 +1,24 @@
+/**
+ * @author: Max Souza
+ * @github: https://github.com/Maaacs
+ * @repo: https://github.com/Maaacs/Android-Monitors
+ * 
+ * Descrição:
+ * Este código é parte do projeto Android Monitors, que
+ * fornece uma interface gráfica para monitoramento de dispositivos Android em tempo rea.
+ * Ele permite iniciar/parar a coleta de dados de temperatura e clock do dispositivo,
+ * assim como a exportação dos logs coletados para análise posterior.
+ *
+ * Contribuições são bem-vindas. Para contribuir, por favor visite o repositório do projeto no GitHub.
+ *
+ * Licença:
+ * Este código é distribuído sob a licença MIT, o que significa que pode ser utilizado,
+ * copiado, modificado e distribuído livremente, desde que seja mantido o mesmo cabeçalho de autoria.
+ *
+ * Copyright (c) 2024 Max Souza
+ */
+
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -18,23 +39,23 @@ let logcat = '';
 let buildVersion = '';
 
 
-// Função para coleta do lado do cliente 
-function startLogcat() {
+// Funções para coleta do lado do cliente 
+function writeLogcat() {
     const logcatProcess = spawn('adb', ['logcat', '-v', 'time']);
     logcatProcess.stdout.on('data', (data) => {
         // Concatena os dados recebidos ao logcat
         logcat += data.toString();
     });
     logcatProcess.on('error', (error) => {
-        console.error(`Erro ao iniciar o logcat: ${error}`);
+        console.error(`Erro ao escrever o logcat: ${error}`);
     });
 }
 
 
-function stopLogcat() {
+function clearLogcat() {
     exec('adb logcat -c', (error, stdout, stderr) => {
         if (error) {
-            console.error(`Erro ao parar o logcat: ${error}`);
+            console.error(`Erro ao limpar o buffer do logcat: ${error}`);
         } else {
             // Limpa o logcat
             logcat = '';
@@ -42,15 +63,15 @@ function stopLogcat() {
     });
 }
 
-// Rota logcat
+// Rota logcat que chama as funções de escrever ou limpar 
 app.get('/logcat', (req, res) => {
     // Obtêm o parâmetro action da requisição
     const action = req.query.action;
-    if (action === 'start' || action === 'stop') {
-        if (action === 'start') {
-            startLogcat();
-        } else {
-            stopLogcat();
+    if (action === 'clear' || action === 'write') {
+        if (action === 'clear') {
+            clearLogcat();
+        } else { 
+            writeLogcat();
         }
         res.send('OK');
     } else {
@@ -112,8 +133,34 @@ app.get('/build-version', (req, res) => {
 });
 
 
+// rota para salva as imagens no servidor
+app.use(express.json({ limit: '50mb' })); // Aumenta tamanho máximo permitido para o corpo da requisição
+app.post('/save-canvas-image', (req, res) => {
+    const { imageName, imageData } = req.body; // Extrai tanto o imageName quanto imageData do corpo da requisição
+    const imageBuffer = Buffer.from(imageData.replace(/^data:image\/png;base64,/, ""), 'base64'); // Converte os dados de base64 para um buffer
+    const filePath = path.join(__dirname, 'outputs', imageName); // Usa o imageName para criar o caminho do arquivo
+    const outputDirectory = path.dirname(filePath); // Determina o diretório baseado no filePath
 
-// Rota exportar
+    // Tenta criar o diretório se não existir
+    console.log(`Creating directory: ${outputDirectory}`);
+    fs.mkdirSync(outputDirectory, { recursive: true });
+    console.log(`Directory created or already exists: ${outputDirectory}`);
+
+    // Tenta salvar o arquivo no diretório
+    fs.writeFile(filePath, imageBuffer, (err) => {
+        if (err) {
+            console.error(`Error saving the image: ${err}`);
+            return res.status(500).send({ message: 'Error saving the image' });
+        }
+        console.log(`Image ${imageName} saved successfully at ${filePath}`);
+        res.send({ message: `${imageName} saved successfully` });
+    });
+});
+
+
+
+
+// Rota exportar que zipa os artefatos e os exporta
 app.get('/export-logs', async (req, res) => {
     // Data e hora atual no horário local
     const currentDate = new Date();
@@ -171,33 +218,6 @@ app.get('/export-logs', async (req, res) => {
     archive.finalize();
 });
 
-
-
-
-app.use(express.json({ limit: '50mb' })); // Para lidar com o tamanho do corpo da requisição.
-
-// rota para salva as imagens no servidor
-app.post('/save-canvas-image', (req, res) => {
-    const { imageName, imageData } = req.body; // Extrai tanto o imageName quanto imageData do corpo da requisição
-    const imageBuffer = Buffer.from(imageData.replace(/^data:image\/png;base64,/, ""), 'base64'); // Converte os dados de base64 para um buffer
-    const filePath = path.join(__dirname, 'outputs', imageName); // Usa o imageName para criar o caminho do arquivo
-    const outputDirectory = path.dirname(filePath); // Determina o diretório baseado no filePath
-
-    // Tenta criar o diretório se não existir
-    console.log(`Creating directory: ${outputDirectory}`);
-    fs.mkdirSync(outputDirectory, { recursive: true });
-    console.log(`Directory created or already exists: ${outputDirectory}`);
-
-    // Tenta salvar o arquivo no diretório
-    fs.writeFile(filePath, imageBuffer, (err) => {
-        if (err) {
-            console.error(`Error saving the image: ${err}`);
-            return res.status(500).send({ message: 'Error saving the image' });
-        }
-        console.log(`Image ${imageName} saved successfully at ${filePath}`);
-        res.send({ message: `${imageName} saved successfully` });
-    });
-});
 
 
 

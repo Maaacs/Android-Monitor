@@ -1,7 +1,29 @@
+/**
+ * @author: Max Souza
+ * @github: https://github.com/Maaacs
+ * @repo: https://github.com/Maaacs/Android-Monitors
+ * 
+ * Descrição:
+ * Este código é parte do projeto Android Monitors, que
+ * fornece uma interface gráfica para monitoramento de dispositivos Android em tempo rea.
+ * Ele permite iniciar/parar a coleta de dados de temperatura e clock do dispositivo,
+ * assim como a exportação dos logs coletados para análise posterior.
+ *
+ * Contribuições são bem-vindas. Para contribuir, por favor visite o repositório do projeto no GitHub.
+ *
+ * Licença:
+ * Este código é distribuído sob a licença MIT, o que significa que pode ser utilizado,
+ * copiado, modificado e distribuído livremente, desde que seja mantido o mesmo cabeçalho de autoria.
+ *
+ * Copyright (c) 2024 Max Souza
+ */
+
+
 document.addEventListener('DOMContentLoaded', function() {
     var tempChartCtx = document.getElementById('temperatureChart').getContext('2d');
     var clockChartCtx = document.getElementById('clockChart').getContext('2d');
     var autoCollectTempIntervalId, autoCollectClockIntervalId;
+    let isCollecting = false; 
 
     // Canvas art
     var temperatureChart = new Chart(tempChartCtx, {
@@ -87,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                document.getElementById(elementId).innerText = `${elementId === 'temperatura' ? 'Temperatura: ' : 'Clock Atual: '}${data[elementId]}${elementId === 'temperatura' ? '°C' : ' MHz'}`;
+                document.getElementById(elementId).innerText = `${elementId === 'temperatura' ? 'Temperatura: ' : 'Clock: '}${data[elementId]}${elementId === 'temperatura' ? '°C' : ' MHz'}`;
                 var now = new Date().toLocaleTimeString();
                 chart.data.labels.push(now);
                 chart.data.datasets[datasetIndex].data.push(data[elementId]);
@@ -96,74 +118,20 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error(`Erro ao buscar ${elementId}:`, error));
     }
 
+    // Funçao para mudar o status/cor do botão
     function toggleButton(buttonId, isActive) {
         const button = document.getElementById(buttonId);
         if (isActive) {
             button.classList.remove('btn-success'); // Bootstrap class para green
             button.classList.add('btn-danger'); // Bootstrap class para red
-            button.textContent = `Parar Coleta`;
+            button.textContent = `Parar`;
         } else {
             button.classList.remove('btn-danger');
             button.classList.add('btn-success');
-            button.textContent = `Iniciar Coleta`;
+            button.textContent = `Iniciar`;
         }
     }
     
-    
-    // Configura o fundo branco para a imagem e exporta
-    document.getElementById('btnExportLogs').addEventListener('click', function() {
-        // Configura o fundo branco para a imagem exportada
-        var canvas = document.getElementById('temperatureChart');
-        var ctx = canvas.getContext('2d');
-        ctx.save(); // Salva o estado atual do canvas
-        ctx.globalCompositeOperation = 'destination-over';
-        ctx.fillStyle = '#fff'; // Define a cor de fundo
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.restore(); // Restaura o estado do canvas
-        
-    
-        // Faça o mesmo para o gráfico do clock
-        var canvasClock = document.getElementById('clockChart');
-        var ctxClock = canvasClock.getContext('2d');
-        ctxClock.save(); 
-        ctxClock.globalCompositeOperation = 'destination-over';
-        ctxClock.fillStyle = '#fff'; 
-        ctxClock.fillRect(0, 0, canvasClock.width, canvasClock.height);
-        ctxClock.restore(); 
-    });
-
-
-
-    // Coleta a temperatura 
-    document.getElementById('btnAutoTemperatura').addEventListener('click', function() {
-        if (autoCollectTempIntervalId) {
-            clearInterval(autoCollectTempIntervalId);
-            autoCollectTempIntervalId = null;
-            toggleButton('btnAutoTemperatura', false);
-        } else {
-            autoCollectTempIntervalId = setInterval(() => {
-                fetchDataAndUpdateChart('http://localhost:3000/temperatura', 'temperatura', temperatureChart, 0);
-                updateVisibility('temperatura');
-            }, 1000); // Coleta a temperatura a cada 1 segundo
-            toggleButton('btnAutoTemperatura', true);
-        }
-    });
-
-
-    // Coleta o clock 
-    document.getElementById('btnAutoClock').addEventListener('click', function() {
-        if (autoCollectClockIntervalId) {
-            clearInterval(autoCollectClockIntervalId);
-            autoCollectClockIntervalId = null;
-            toggleButton('btnAutoClock', false);
-        } else {
-            autoCollectClockIntervalId = setInterval(() => {
-                fetchDataAndUpdateChart('http://localhost:3000/clock', 'clock', clockChart, 0);
-                updateVisibility('clock');
-            }, 1000); // Coleta o clock a cada 1 segundo
-            toggleButton('btnAutoClock', true);
-        }
-    });
 
     // Apresenta o valor do clock e temperatura
     function updateVisibility(elementId) {
@@ -176,25 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
 
-    // Adiciona a função toggleLogcat aos manipuladores de eventos aos botões de iniciar captura
-    document.getElementById('btnAutoTemperatura').addEventListener('click', function() {
-        if (autoCollectTempIntervalId) {
-            toggleLogcat('start');
-        } else {
-            toggleLogcat('stop');
-        }
-    });
-
-    document.getElementById('btnAutoClock').addEventListener('click', function() {
-        if (autoCollectClockIntervalId) {
-            toggleLogcat('start');
-        } else {
-            toggleLogcat('stop');
-        }
-    });
-
-
-    // Função para enviar uma requisição ao servidor para iniciar ou parar a coleta do logcat
+    // Função para enviar uma requisição ao servidor para limpar ou escrever o logcat
     function toggleLogcat(action) {
         fetch(`http://localhost:3000/logcat?action=${action}`)
             .then(response => {
@@ -240,49 +190,91 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Erro ao salvar a imagem do gráfico:', error));
     }
 
+    // Função para adicionar um fundo branco aos gráficos do canvas
+    function configuraFundoBrancoParaExportacao() {
+        // Configura o fundo branco para o gráfico de temperatura
+        var canvasTemperatura = document.getElementById('temperatureChart');
+        var ctxTemperatura = canvasTemperatura.getContext('2d');
+        ctxTemperatura.save(); // Salva o estado atual do canvas
+        ctxTemperatura.globalCompositeOperation = 'destination-over';
+        ctxTemperatura.fillStyle = '#fff'; // Define a cor de fundo
+        ctxTemperatura.fillRect(0, 0, canvasTemperatura.width, canvasTemperatura.height);
+        ctxTemperatura.restore(); 
+    
+        // Configura o fundo branco para o gráfico de clock
+        var canvasClock = document.getElementById('clockChart');
+        var ctxClock = canvasClock.getContext('2d');
+        ctxClock.save();
+        ctxClock.globalCompositeOperation = 'destination-over';
+        ctxClock.fillStyle = '#fff';
+        ctxClock.fillRect(0, 0, canvasClock.width, canvasClock.height);
+        ctxClock.restore();
+    }
+    
 
+    // Função para exibir o alerta
+    function funcaoAlerta() {
+        const alertPlaceholder = document.getElementById('liveAlertPlaceholder');
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = [
+            `<div class="alert alert-success alert-dismissible fade show" role="alert">`,
+            `   <div>Artefatos exportados com sucesso!</div>`,
+            '</div>'
+        ].join('');
 
-    // Evento de clique para exportar logs e salvar imagens dos gráficos
-    document.getElementById('btnExportLogs').addEventListener('click', function() {
-        // Salva as imagens do canvas antes de zipar junto ao logcat
-        saveCanvasImage('temperatureChart', 'temperatureChart.png');
-        saveCanvasImage('clockChart', 'clockChart.png');
-        exportLogs();
-        
+        alertPlaceholder.append(wrapper);
+        // Remove o alerta após 3 segundos
+        setTimeout(() => {
+            wrapper.remove();
+        }, 3000);
+    }
+    
+
+    
+    // Função do botão principal que inicia/para/exporta
+    document.getElementById('btnIniciar').addEventListener('click', function() {
+        // Alterna o estado da coleta
+        isCollecting = !isCollecting;
+
+        // Atualiza a aparência do botão com base no estado atual
+        toggleButton('btnIniciar', isCollecting);
+
+        if (isCollecting) {
+            // Inicia a coleta de temperatura e clock
+            autoCollectTempIntervalId = setInterval(() => {
+            fetchDataAndUpdateChart('http://localhost:3000/temperatura', 'temperatura', temperatureChart, 0);
+            updateVisibility('temperatura');
+        }, 1000);
+
+            autoCollectClockIntervalId = setInterval(() => {
+            fetchDataAndUpdateChart('http://localhost:3000/clock', 'clock', clockChart, 0);
+            updateVisibility('clock');
+        }, 1000);
+            // Escreve no logcat
+            toggleLogcat('write');
+        } else {
+            // Para a coleta de temperatura
+            if (autoCollectTempIntervalId) {
+                clearInterval(autoCollectTempIntervalId);
+                autoCollectTempIntervalId = null;
+            }
+
+            // Para a coleta do clock
+            if (autoCollectClockIntervalId) {
+            clearInterval(autoCollectClockIntervalId);
+            autoCollectClockIntervalId = null;
+            }
+
+            funcaoAlerta();
+            toggleLogcat('clear');
+            configuraFundoBrancoParaExportacao(); 
+            // Salva as imagens do canvas antes de zipar junto ao logcat
+            saveCanvasImage('temperatureChart', 'temperatureChart.png');
+            saveCanvasImage('clockChart', 'clockChart.png');
+            // Zipa e exporta os artefatos
+            exportLogs();
+        }
     });
-
-
-    // Seleciona o elemento onde o alerta será inserido
-    const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
-    // Função para adicionar o alerta ao elemento
-    const appendAlert = (message, type) => {
-    const wrapper = document.createElement('div')
-    // Conteúdo do HTML
-    wrapper.innerHTML = [
-        `<div class="alert alert-${type} alert-dismissible fade show" role="alert">`,
-        `   <div>${message}</div>`,
-        //'   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-        
-        '</div>'
-    ].join('')
-
-    // Adiciona o alerta ao elemento
-    alertPlaceholder.append(wrapper)
-    setTimeout(() => {
-        wrapper.remove()
-    }, 3000)
-    }
-
-    // Seleciona o botão que aciona o alerta
-    const alertTrigger = document.getElementById('btnExportLogs')
-
-    // Adiciona um evento de clique ao botão
-    if (alertTrigger) {
-        alertTrigger.addEventListener('click', () => {
-        appendAlert('Exportado com sucesso!', 'success')
-    })
-    }
-
 
 
 

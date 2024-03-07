@@ -1,6 +1,16 @@
-# Monitoramento de Dispositivos Android
+<h1>
+<br> Android Monitor <br>
+</h1>
+
 
 Solução para monitorar em tempo real a temperatura e o clock do processador de dispositivos Android, além de coletar logs do sistema para análise.
+
+
+<p align="center">
+  <img alt="Spaceship with Hyper and One Dark" src="https://github.com/Maaacs/Android-Monitors/assets/56925726/d4466860-bcd5-4bac-bdea-a163a1ddd226" width="980px">
+</p>
+
+
 
 ## Recursos
 
@@ -13,6 +23,7 @@ Solução para monitorar em tempo real a temperatura e o clock do processador de
 
 - Node.js e Express para o servidor backend.
 - ADB (Android Debug Bridge) para coleta de dados do dispositivo.
+- Bootstrap como framework front-end.
 - Chart.js para renderizar os gráficos no frontend.
 - Archiver para criar arquivos ZIP para exportação.
 
@@ -50,8 +61,8 @@ O servidor agora deve estar rodando e acessível em `http://localhost:3000`.
 ## Uso
 
 - Acesse `http://localhost:3000` através de um navegador web para visualizar a interface do usuário.
-- Use os botões "Obter Temperatura" ou "Obter Clock" para a coleta contínua de dados.
-- Clique em "Exportar Logs" para baixar um arquivo ZIP contendo os gráficos e logs do dispositivo. Os artefatos vão para `src/outputs`.
+- Use o botão "Iniciar" para a coleta contínua de dados.
+- Clique em "Parar" para baixar o arquivo ZIP contendo os gráficos e logs do dispositivo. Os artefatos vão para `src/outputs`.
 
 ## Endpoints do Servidor
 

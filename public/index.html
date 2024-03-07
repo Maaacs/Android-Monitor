@@ -1,25 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- 
+    Autor: Max Souza
+    GitHub: https://github.com/Maaacs
+    Repositório: https://github.com/Maaacs/Android-Monitors
+  
+    Descrição:
+    Este código é parte do projeto Android Monitors, que
+    fornece uma interface gráfica para monitoramento de dispositivos Android em tempo real.
+    Ele permite iniciar/parar a coleta de dados de temperatura e clock do dispositivo,
+    assim como a exportação dos logs coletados para análise posterior.
+  
+    Contribuições são bem-vindas. Para contribuir, por favor visite o repositório do projeto no GitHub.
+  
+    Licença:
+    Este código é distribuído sob a licença MIT, o que significa que pode ser utilizado,
+    copiado, modificado e distribuído livremente, desde que seja mantido o mesmo cabeçalho de autoria.
+  
+    Copyright (c) 2024 Max Souza
+    -->
     <meta charset="UTF-8">
-    <title>Monitoramento de Dispositivo</title>
-    <!--<link rel="stylesheet" type="text/css" href="css/styles.css" media="screen" -->
+    <title>Android Monitor</title>
+    <link rel="icon" type="image/png" href="img/ico.png">
     <link rel="stylesheet" type="text/css" href="css/styles.css" media="screen"> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
 </head>
 <body>
     <div class="container-fluid">
         <h1 id="deviceHeader">Carregando informações do dispositivo...</h1>
-        <button id="btnAutoTemperatura" type="button" class="btn btn-success" style="width: 180px;">Obter Temperatura</button>
         <p id="temperatura"></p>
         <canvas id="temperatureChart"></canvas>
-        <button id="btnAutoClock" type="button" class="btn btn-success"style="width: 180px;">Obter Clock</button>
         <p id="clock"></p>
         <canvas id="clockChart"></canvas>
-        <div class="export">
-            <button id="btnExportLogs" type="button" class="btn btn-primary" style="width: 180px;">Exportar Logs</button>
+        <div class="iniciar-button">
+            <button id="btnIniciar" type="button" class="btn btn-success" style="width: 180px;">Iniciar</button>
             <div id="liveAlertPlaceholder"></div>
         </div>
     </div>
