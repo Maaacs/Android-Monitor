@@ -7,7 +7,7 @@ Solução para monitorar em tempo real a temperatura e o clock do processador de
 
 
 <p align="center">
-  <img alt="Spaceship with Hyper and One Dark" src="https://github.com/Maaacs/Android-Monitors/assets/56925726/d4466860-bcd5-4bac-bdea-a163a1ddd226" width="980px">
+  <img alt="Spaceship with Hyper and One Dark" src="https://github.com/Maaacs/Android-Monitors/assets/56925726/91575ee4-7911-4a83-8aba-5440fe881d84" width="980px">
 </p>
 
 
@@ -33,7 +33,7 @@ Solução para monitorar em tempo real a temperatura e o clock do processador de
 
 - Node.js (versão recomendada: 14.x ou superior)
 - ADB instalado e configurado no seu sistema
-- Dispositivo Android em root conectado ao computador onde o servidor será executado
+- Dispositivo Android conectado ao computador onde o servidor será executado
 
 ### Instalação
 
@@ -46,7 +46,7 @@ Solução para monitorar em tempo real a temperatura e o clock do processador de
 2. Navegue para a pasta do projeto e instale as dependências:
 
    ```bash
-   cd Android-Monitor
+   cd Android-Monitors
    npm install
    ```
 
@@ -61,6 +61,7 @@ O servidor agora deve estar rodando e acessível em `http://localhost:3000`.
 ## Uso
 
 - Acesse `http://localhost:3000` através de um navegador web para visualizar a interface do usuário.
+- Acesse o seu terminal e execute ```adb root``` caso a versão do SO instalado não seja de usuário.
 - Use o botão "Iniciar" para a coleta contínua de dados.
 - Clique em "Parar" para baixar o arquivo ZIP contendo os gráficos e logs do dispositivo. Os artefatos vão para `src/outputs`.
 

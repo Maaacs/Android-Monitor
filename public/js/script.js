@@ -18,6 +18,10 @@
  * Copyright (c) 2024 Max Souza
  */
 
+let totalClock = 0;
+let totalTemperature = 0;
+let clockSamples = 0;
+let temperatureSamples = 0;
 
 document.addEventListener('DOMContentLoaded', function() {
     var tempChartCtx = document.getElementById('temperatureChart').getContext('2d');
@@ -104,16 +108,26 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchDeviceInfo(); 
     
 
-    // Atualiza o gráfico
+    // Atualiza o gráfico e acumula os dados para cálculo da média
     function fetchDataAndUpdateChart(url, elementId, chart, datasetIndex) {
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                document.getElementById(elementId).innerText = `${elementId === 'temperatura' ? 'Temperatura: ' : 'Clock: '}${data[elementId]}${elementId === 'temperatura' ? '°C' : ' MHz'}`;
+                const value = data[elementId];
+                document.getElementById(elementId).innerText = `${elementId === 'temperatura' ? 'Temperatura: ' : 'Clock: '}${value}${elementId === 'temperatura' ? '°C' : ' MHz'}`;
                 var now = new Date().toLocaleTimeString();
                 chart.data.labels.push(now);
-                chart.data.datasets[datasetIndex].data.push(data[elementId]);
+                chart.data.datasets[datasetIndex].data.push(value);
                 chart.update();
+
+                // Acumula os valores para cálculo da média
+                if (elementId === 'temperatura') {
+                    totalTemperature += value;
+                    temperatureSamples++;
+                } else if (elementId === 'clock') {
+                    totalClock += value;
+                    clockSamples++;
+                }
             })
             .catch(error => console.error(`Erro ao buscar ${elementId}:`, error));
     }
@@ -228,14 +242,27 @@ document.addEventListener('DOMContentLoaded', function() {
             wrapper.remove();
         }, 3000);
     }
+
+    // Calcula a média da temperatura e do clock
+    function mediaTempClock() {
+        const averageTemperature = totalTemperature / temperatureSamples;
+        const averageClock = totalClock / clockSamples;
+    
+        document.getElementById('temperaturaMedia').innerText = `Média da Temperatura: ${averageTemperature.toFixed(2)}°C`;
+        document.getElementById('clockMedia').innerText = `Média do Clock: ${averageClock.toFixed(2)} MHz`;
+        updateVisibility('temperaturaMedia');
+        updateVisibility('clockMedia');
+   
+        totalClock = 0;
+        totalTemperature = 0;
+        clockSamples = 0;
+        temperatureSamples = 0;
+    }
     
 
-    
     // Função do botão principal que inicia/para/exporta
     document.getElementById('btnIniciar').addEventListener('click', function() {
-        // Alterna o estado da coleta
         isCollecting = !isCollecting;
-
         // Atualiza a aparência do botão com base no estado atual
         toggleButton('btnIniciar', isCollecting);
 
@@ -245,7 +272,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fetchDataAndUpdateChart('http://localhost:3000/temperatura', 'temperatura', temperatureChart, 0);
             updateVisibility('temperatura');
         }, 1000);
-
             autoCollectClockIntervalId = setInterval(() => {
             fetchDataAndUpdateChart('http://localhost:3000/clock', 'clock', clockChart, 0);
             updateVisibility('clock');
@@ -265,10 +291,10 @@ document.addEventListener('DOMContentLoaded', function() {
             autoCollectClockIntervalId = null;
             }
 
+            mediaTempClock();
             funcaoAlerta();
             toggleLogcat('clear');
             configuraFundoBrancoParaExportacao(); 
-            // Salva as imagens do canvas antes de zipar junto ao logcat
             saveCanvasImage('temperatureChart', 'temperatureChart.png');
             saveCanvasImage('clockChart', 'clockChart.png');
             // Zipa e exporta os artefatos
