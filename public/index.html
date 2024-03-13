@@ -40,6 +40,22 @@
             <button id="btnIniciar" type="button" class="btn btn-success" style="width: 180px;">Iniciar</button>
             <div id="liveAlertPlaceholder"></div>
         </div>
+        <div id="process-list" class="mt-4">
+            <h2>Processos em Execução</h2>
+            <div class="table-responsive">
+                <table id="process-table" class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>PID</th>
+                            <th>Processo</th>
+                            <th>CPU %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <script src="js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js"></script>

@@ -22,6 +22,9 @@ let totalClock = 0;
 let totalTemperature = 0;
 let clockSamples = 0;
 let temperatureSamples = 0;
+let dataTemperature = [];
+let dataClock = [];
+let processIntervalId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     var tempChartCtx = document.getElementById('temperatureChart').getContext('2d');
@@ -258,6 +261,47 @@ document.addEventListener('DOMContentLoaded', function() {
         clockSamples = 0;
         temperatureSamples = 0;
     }
+
+    function fetchProcessData() {
+        fetch('http://localhost:3000/processos')
+            .then(response => response.text())
+            .then(data => {
+                displayProcessData(data);
+            })
+            .catch(error => {
+                console.error("Erro ao buscar dados dos processos:", error);
+            });
+    }
+    
+    // Função para mostrar os processos
+    function displayProcessData(rawData) {
+        const lines = rawData.split('\n'); 
+        const processTableBody = document.getElementById('process-table').querySelector('tbody');
+        processTableBody.innerHTML = '';
+    
+        // Pula a primeira linha se ela for o cabeçalho e começar a partir da segunda linha
+        lines.slice(5).forEach(line => {
+            const columns = line.trim().split(/\s+/); 
+            if(columns.length > 1) { // Checa se a linha contém dados de processo
+                const row = document.createElement('tr');
+                
+
+                const processCell = document.createElement('td');
+                processCell.textContent = columns[0]; 
+                row.appendChild(processCell);
+    
+                const userCell = document.createElement('td');
+                userCell.textContent = columns[1]; 
+                row.appendChild(userCell);
+    
+                const cpuUsageCell = document.createElement('td');
+                cpuUsageCell.textContent = columns[8]; 
+                row.appendChild(cpuUsageCell);
+
+                processTableBody.appendChild(row);
+            }
+        });
+    }
     
 
     // Função do botão principal que inicia/para/exporta
@@ -276,6 +320,8 @@ document.addEventListener('DOMContentLoaded', function() {
             fetchDataAndUpdateChart('http://localhost:3000/clock', 'clock', clockChart, 0);
             updateVisibility('clock');
         }, 1000);
+            // Inicia a atualização da tabela de processos
+            processIntervalId = setInterval(fetchProcessData, 1000);
             // Escreve no logcat
             toggleLogcat('write');
         } else {
@@ -289,6 +335,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (autoCollectClockIntervalId) {
             clearInterval(autoCollectClockIntervalId);
             autoCollectClockIntervalId = null;
+            }
+
+            // Para atualização da tabela de processos
+            if (processIntervalId) {
+                clearInterval(processIntervalId);
+                processIntervalId = null;
             }
 
             mediaTempClock();

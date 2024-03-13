@@ -106,6 +106,15 @@ app.get('/clock', (req, res) => {
     });
 });
 
+app.get('/processos', (req, res) => {
+    exec("adb shell top -n 1 -b", (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return res.status(500).send('Erro ao obter os processos');
+        }
+        res.send(stdout);
+    });
+});
 
 // Rota nome device
 app.get('/nomeDispositivo', (req, res) => {
